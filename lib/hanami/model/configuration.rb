@@ -1,4 +1,6 @@
-require 'rom/configuration'
+# frozen_string_literal: true
+
+require "rom/configuration"
 
 module Hanami
   module Model
@@ -30,13 +32,13 @@ module Hanami
       def initialize(configurator)
         @backend = configurator.backend
         @url = configurator.url
-        @migrations        = configurator._migrations
-        @schema            = configurator._schema
-        @gateway_config    = configurator._gateway
-        @logger            = configurator._logger
+        @migrations = configurator._migrations
+        @schema = configurator._schema
+        @gateway_config = configurator._gateway
+        @logger = configurator._logger
         @migrations_logger = configurator.migrations_logger
-        @mappings          = {}
-        @entities          = {}
+        @mappings = {}
+        @entities = {}
       end
 
       # NOTE: This must be changed when we want to support several adapters at the time
@@ -147,7 +149,7 @@ module Hanami
       #
       # @since 1.0.0
       # @api private
-      def load!(repositories, &blk) # rubocop:disable Metrics/AbcSize
+      def load!(repositories, &blk)
         rom.setup.auto_registration(config.directory.to_s) unless config.directory.nil?
         rom.instance_eval(&blk)                            if     block_given?
         configure_gateway
