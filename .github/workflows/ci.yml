@@ -29,6 +29,10 @@ jobs:
           - postgresql
     env:
       DB: ${{matrix.db}}
+      HANAMI_DATABASE_USERNAME: root
+      HANAMI_DATABASE_PASSWORD: root
+      HANAMI_DATABASE_HOST: 127.0.0.1
+      HANAMI_DATABASE_NAME: hanami_model
     steps:
       - uses: actions/checkout@v1
       - name: Install package dependencies
@@ -41,30 +45,15 @@ jobs:
       - name: Set up PostgreSQL using VM's server
         run: |
           sudo systemctl start postgresql.service
-          sudo -u postgres psql -c "CREATE USER root WITH SUPERUSER PASSWORD 'root'"
+          sudo -u postgres psql -c "CREATE USER ${{ env.HANAMI_DATABASE_USERNAME }} WITH SUPERUSER PASSWORD '${{ env.HANAMI_DATABASE_PASSWORD }}'"
           sudo createdb ${{ env.HANAMI_DATABASE_NAME}}
         env:
           HANAMI_DATABASE_NAME: hanami_model
         if: ${{ matrix.db == 'postgresql' }}
+      - name: Set up MySQL using VM's server
+        run: |
+          sudo systemctl start mysql.service
+          mysql -u ${{ env.HANAMI_DATABASE_USERNAME }} -e "create database ${{ env.HANAMI_DATABASE_NAME }}";
+        if: ${{ matrix.db == 'mysql' }}
       - name: Run all tests
-        env:
-          HANAMI_DATABASE_USERNAME: root
-          HANAMI_DATABASE_PASSWORD: root
-          HANAMI_DATABASE_HOST: 127.0.0.1
-          HANAMI_DATABASE_NAME: hanami_model
         run: script/ci
-    services:
-      mysql:
-        image: mysql:8
-        env:
-          ALLOW_EMPTY_PASSWORD: true
-          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: hanami_model
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
