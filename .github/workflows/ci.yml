@@ -1,6 +1,6 @@
 name: ci
 
-"on":
+on:
   push:
     paths:
       - ".github/workflows/ci.yml"
@@ -36,12 +36,8 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
+          bundler-cache: true
           ruby-version: ${{matrix.ruby}}
-      - name: Install latest bundler
-        run: |
-          gem install bundler --no-document
-      - name: Bundle install
-        run: bundle install --jobs 4 --retry 3
       - name: Run all tests
         env:
           HANAMI_DATABASE_USERNAME: root
@@ -64,11 +60,3 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-      postgres:
-        image: postgres:13
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: root
-          POSTGRES_DB: hanami_model
