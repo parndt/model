@@ -38,6 +38,11 @@ jobs:
         with:
           bundler-cache: true
           ruby-version: ${{matrix.ruby}}
+      - name: Set up PostgreSQL using VM's server
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql -c "CREATE USER root WITH SUPERUSER PASSWORD 'root'"
+        if: ${{ matrix.db == 'postgresql' }}
       - name: Run all tests
         env:
           HANAMI_DATABASE_USERNAME: root
@@ -60,11 +65,3 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-      postgres:
-        image: postgres:13
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: root
-          POSTGRES_DB: hanami_model
