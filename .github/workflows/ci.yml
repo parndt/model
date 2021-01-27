@@ -55,5 +55,7 @@ jobs:
           sudo systemctl start mysql.service
           mysql -u ${{ env.HANAMI_DATABASE_USERNAME }} -p${{ env.HANAMI_DATABASE_PASSWORD }} -e "create database ${{ env.HANAMI_DATABASE_NAME }}";
         if: ${{ matrix.db == 'mysql' }}
-      - name: Run all tests
-        run: script/ci
+      - run: rm -rf coverage
+      - run: bundle exec rubocop .
+      - run: bundle exec rake spec:unit
+      - run: bundle exec rake codecov:upload
