@@ -57,5 +57,5 @@ jobs:
         if: ${{ matrix.db == 'mysql' }}
       - run: rm -rf coverage
       - run: bundle exec rubocop .
-      - run: bundle exec rake spec:unit
+      - run: bundle exec rspec spec/**/*_spec.rb
       - run: bundle exec rake codecov:upload
