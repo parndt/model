@@ -29,8 +29,8 @@ jobs:
           - postgresql
     env:
       DB: ${{matrix.db}}
-      HANAMI_DATABASE_USERNAME: root
-      HANAMI_DATABASE_PASSWORD: root
+      HANAMI_DATABASE_USERNAME: runner
+      HANAMI_DATABASE_PASSWORD: runner
       HANAMI_DATABASE_HOST: 127.0.0.1
       HANAMI_DATABASE_NAME: hanami_model
     steps:
@@ -42,7 +42,7 @@ jobs:
         with:
           bundler-cache: true
           ruby-version: ${{matrix.ruby}}
-      - name: Set up PostgreSQL using VM's server
+      - name: Set up PostgreSQL using VM server
         run: |
           sudo systemctl start postgresql.service
           sudo -u postgres psql -c "CREATE USER ${{ env.HANAMI_DATABASE_USERNAME }} WITH SUPERUSER PASSWORD '${{ env.HANAMI_DATABASE_PASSWORD }}'"
@@ -50,10 +50,10 @@ jobs:
         env:
           HANAMI_DATABASE_NAME: hanami_model
         if: ${{ matrix.db == 'postgresql' }}
-      - name: Set up MySQL using VM's server
+      - name: Set up MySQL using VM server
         run: |
           sudo systemctl start mysql.service
-          mysql -u ${{ env.HANAMI_DATABASE_USERNAME }} -p${{ env.HANAMI_DATABASE_PASSWORD }} -e "create database ${{ env.HANAMI_DATABASE_NAME }}";
+          mysql -u root -proot -e "create database ${{ env.HANAMI_DATABASE_NAME }}";
         if: ${{ matrix.db == 'mysql' }}
       - run: rm -rf coverage
       - run: bundle exec rubocop .
